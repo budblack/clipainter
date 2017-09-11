@@ -1,0 +1,8 @@
+{
+  "files": {
+    "src": [
+      "events/**/*.js"
+    ]
+  },
+  "runOnce": true
+}
