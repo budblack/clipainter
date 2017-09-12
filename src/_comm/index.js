@@ -15,7 +15,7 @@ emitter.emit = new Proxy(emitter.emit, {
     console.log({ target, ctx, args });
     
     let [event, data] = args;
-    if (event.toLowerCase() != 'core/events/trace') {
+    if (event.toLowerCase() !== 'core/events/trace') {
       emitter.emit('core/events/trace', { event, data });
     }
     
