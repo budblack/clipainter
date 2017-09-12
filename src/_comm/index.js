@@ -1,30 +1,36 @@
-const EventEmitter = require('events').EventEmitter;
-let emitter        = new EventEmitter();
-
-emitter.emit = new Proxy(emitter.emit, {
+/*eslint-disable linebreak-style*/
+const EventEmitter    = require('events').EventEmitter;
+let emitter           = new EventEmitter(),
+      { emit: _emit } = emitter;
+emitter.emit          = new Proxy(emitter.emit, {
   
-  /***************************************
-   * 注册一个Proxy, 横切后续所有的事件发射
-   * @param target
-   * @param ctx
-   * @param args
-   * @returns {*}
-   */
+  /** *************************************
+   * 注册两个Proxy, 横切后续所有的事件发射
+   *                横切后续所有的事件注册
+   ****************************************/
+  
   apply (target, ctx, args) {
-    console.log({ target, ctx, args });
-    
     let [event, data] = args;
     if (event.toLowerCase() !== 'core/events/trace') {
-      emitter.emit('core/events/trace', { event, data });
+      _emit('core/events/trace', { event, data });
     }
-    
     return Reflect.apply(... arguments);
   }
 });
 
 emitter.on = new Proxy(emitter.on, {
   apply (target, ctx, args) {
-    console.log({ target, ctx, args });
+    let [event, handler] = args;
+    arguments[1]         = new Proxy(
+        handler,
+        {
+          apply (_target, _ctx, _args) {
+            _emit('core/events/handle', _args);
+            return Reflect.apply(... arguments);
+          }
+        }
+    );
+    _emit('core/events/subscrib', { event, handler });
     return Reflect.apply(... arguments);
   }
 });
