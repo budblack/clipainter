@@ -14,26 +14,27 @@ emitter.emit          = new Proxy(emitter.emit, {
     if (event.toLowerCase() !== 'core/events/trace') {
       _emit('core/events/trace', { event, data });
     }
+    
     return Reflect.apply(... arguments);
   }
 });
-
-emitter.on = new Proxy(emitter.on, {
-  apply (target, ctx, args) {
-    let [event, handler] = args;
-    arguments[1]         = new Proxy(
-        handler,
-        {
-          apply (_target, _ctx, _args) {
-            _emit('core/events/handle', _args);
-            return Reflect.apply(... arguments);
-          }
-        }
-    );
-    _emit('core/events/subscrib', { event, handler });
-    return Reflect.apply(... arguments);
-  }
-});
+//
+// emitter.on = new Proxy(emitter.on, {
+//   apply (target, ctx, args) {
+//     let [event, handler] = args;
+//     arguments[1]         = new Proxy(
+//         handler,
+//         {
+//           apply (_target, _ctx, _args) {
+//             _emit('core/events/handle', _args);
+//             return Reflect.apply(... arguments);
+//           }
+//         }
+//     );
+//     _emit('core/events/subscrib', { event, handler });
+//     return Reflect.apply(... arguments);
+//   }
+// });
 
 module.exports = {
   app: null,

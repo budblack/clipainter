@@ -10,6 +10,8 @@ console.log(new Date());
 /** ****************************************************************
  *                初始化项目
  *******************************************************************/
+import ComMain from './tpls/main.vue';
+
 let Vue             = require('vue/dist/vue'),
     _comm           = require('./_comm'),
     { emitter: em } = _comm,
@@ -18,30 +20,29 @@ let Vue             = require('vue/dist/vue'),
 /** ****************************************************************
  *                 auto load all scripts in project.
  *******************************************************************/
-Scripts.keys().forEach((path) => {
-  try {
-    let _m = require(path);
-    em.emit('core/module/load', { path, module: _m });
-  } catch (e) {
-    em.emit(`core/exceptions/${e}`, e);
-  }
-});
+Scripts.keys()
+       .filter((path) => {return path.match(/\.js$/) !== null;})
+       .forEach((path) => {
+         try {
+           // path 需要类型转换一下
+           let _m = require(path + '');
+           em.emit('core/module/load', { path, module: _m });
+         } catch (e) {
+           em.emit(`core/exceptions/${e}`, e);
+         }
+       });
 
 module.exports = {
   init (id) {
     let app        = new Vue(
         {
-          el     : `#${id}`,
-          data   : {},
-          methods: {},
-          mounted: function () {
-            em.emit('core/module/init', this);
-          }
+          el    : `#${id}`,
+          render: (h) => {return h(ComMain);}
         }
     );
     module.exports = {
-      inst: app
-      
+      inst: app,
+      em
     };
     
     if (window) {
