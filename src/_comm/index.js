@@ -1,6 +1,5 @@
 const EventEmitter = require('events').EventEmitter;
-
-let emitter = new EventEmitter();
+let emitter        = new EventEmitter();
 
 emitter.emit = new Proxy(emitter.emit, {
   
@@ -23,12 +22,13 @@ emitter.emit = new Proxy(emitter.emit, {
   }
 });
 
-emitter.on     = new Proxy(emitter.on, {
+emitter.on = new Proxy(emitter.on, {
   apply (target, ctx, args) {
     console.log({ target, ctx, args });
     return Reflect.apply(... arguments);
   }
 });
+
 module.exports = {
   app: null,
   emitter
