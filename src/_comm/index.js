@@ -11,6 +11,12 @@ emitter.emit          = new Proxy(emitter.emit, {
   
   apply (target, ctx, args) {
     let [event, data] = args;
+    
+    /** ******************
+     *  空消息自动替换
+     *********************/
+    event = event || 'dev/trace';
+    arguments[2][0] = event;
     if (event.toLowerCase() !== 'core/events/trace') {
       _emit('core/events/trace', { event, data });
     }

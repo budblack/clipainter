@@ -2,10 +2,8 @@
     <div :class="$style.container">
         <div :class="$style.row">
             <div :class="$style.grd"><TpSceneContainer></TpSceneContainer></div>
-            <div :class="$style.grd"></div>
         </div>
         <div :class="$style.row">
-            <div :class="$style.grd"></div>
             <div :class="$style.grd"></div>
         </div>
     </div>
