@@ -12,47 +12,65 @@ console.log(new Date());
  *******************************************************************/
 import ComMain from './tpls/main.vue';
 
-let Vue             = require('vue/dist/vue'),
-    _comm           = require('./_comm'),
-    { emitter: em } = _comm,
-    Scripts         = require.context('./', true, /\.js$/);
+let Vue = require('vue/dist/vue'),
+    ScriptsComms = require.context('./_comm/', true, /\.js$/),
+    ScriptsEvents = require.context('./events/', true, /\.js$/),
+    ScriptsControllers = require.context('./controller/', true, /\.js$/),
+    _comm = require('./_comm'),
+    {emitter: em} = _comm;
 
 /** ****************************************************************
  *                 auto load all scripts in project.
  *******************************************************************/
-Scripts.keys()
-       .filter((path) => {return path.match(/\.js$/) !== null;})
-       .forEach((path) => {
-         try {
-           // path 需要类型转换一下
-           let _m = require(path + '');
-           em.emit('core/module/load', { path, module: _m });
-         } catch (e) {
-           em.emit(`core/exceptions/${e}`, e);
-         }
-       });
+[]
+    .concat((ScriptsComms ? ScriptsComms.keys() : []).map((path) => {
+        return path.replace('./', './_comm/');
+    }))
+    .concat((ScriptsControllers ? ScriptsControllers.keys() : []).map((path) => {
+        return path.replace('./', './controller/');
+    }))
+    .concat((ScriptsEvents ? ScriptsEvents.keys() : []).map((path) => {
+        return path.replace('./', './events/');
+    }))
+    .filter((path) => {
+        return path.match(/\.js$/) !== null;
+    })
+    .forEach((path) => {
+        try {
+            console.log(path);
+            // path 需要类型转换一下
+            let _m = require(path + '');
+            em.emit('core/module/load', {path, module: _m});
+        } catch (e) {
+            console.log(e)
+            em.emit(`core/exceptions/${e}`, e);
+        }
+    });
 
 module.exports = {
-  init (id) {
-    let app        = new Vue(
-        {
-          el    : `#${id}`,
-          render: (h) => {return h(ComMain);}
+    initTestLayout(id) {
+        let app = new Vue(
+            {
+                el: `#${id}`,
+                render: (h) => {
+                    // ComMain.setLayoutTpl('layout/test_flex');
+                    return h(ComMain);
+                }
+            }
+        );
+        module.exports = {
+            inst: app,
+            em
+        };
+
+        if (window) {
+            window.clptr = module.exports;
         }
-    );
-    module.exports = {
-      inst: app,
-      em
-    };
-    
-    if (window) {
-      window.clptr = module.exports;
     }
-  }
 };
 
 if (window) {
-  window.clptr = module.exports;
+    window.clptr = module.exports;
 }
 
 

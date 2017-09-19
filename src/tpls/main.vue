@@ -10,23 +10,35 @@
 </style>
 <script lang="js">
     import 'normalize.css';
-    import TestLaytout from './test/layout.vue';
-    const comm            = require('../_comm'),
-          { emitter: em } = comm;
+    import TestLaytout from './layout/test_flex.vue';
 
-    em.emit('dev/trace', { msg: '初始化ComMain模块' });
+    const comm = require('../_comm'),
+        {emitter: em} = comm;
+
+    em.emit('dev/trace', {msg: '初始化ComMain模块'});
 
     export default {
-      data () {
-        return {};
-      },
-      components: {
-        TestLaytout
-      },
-      watch     : {},
-      methods   : {},
-      mounted   : function () {
-        em.emit('dev/trace', '成功载入主视图');
-      }
+        data() {
+            return {
+                layoutTpl: 'layout/test_flex'
+            };
+        },
+        components: {
+            TestLaytout
+        },
+        watch: {},
+        methods: {
+            setLayoutTpl: function (tplName) {
+                switch (tplName) {
+                    default:
+                        break;
+                }
+                this.layoutTpl = tplName;
+                console.log(tplName)
+            }
+        },
+        mounted: function () {
+            em.emit('dev/trace', '成功载入主视图');
+        }
     };
 </script>
