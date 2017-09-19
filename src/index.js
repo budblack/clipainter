@@ -22,6 +22,7 @@ let Vue = require('vue/dist/vue'),
 /** ****************************************************************
  *                 auto load all scripts in project.
  *******************************************************************/
+let modulesIns = {};
 []
     .concat((ScriptsComms ? ScriptsComms.keys() : []).map((path) => {
         return path.replace('./', './_comm/');
@@ -37,36 +38,42 @@ let Vue = require('vue/dist/vue'),
     })
     .forEach((path) => {
         try {
-            console.log(path);
-            // path 需要类型转换一下
             let _m = require(path + '');
+            let modulePath = path.split('/');
+            let pathStack = [];
+
+            let obj = modulesIns;
+            for (let i = 1, len = modulePath.length; i < len; i++) {
+                if (obj[modulePath[i]] === undefined) {
+                    obj[modulePath[i]] = (i === len - 1 ? _m : {})
+                }
+                obj = obj[modulePath[i]];
+            }
+
+
             em.emit('core/module/load', {path, module: _m});
         } catch (e) {
-            console.log(e)
             em.emit(`core/exceptions/${e}`, e);
         }
     });
 
 module.exports = {
-    initTestLayout(id) {
-        let app = new Vue(
-            {
-                el: `#${id}`,
-                render: (h) => {
-                    // ComMain.setLayoutTpl('layout/test_flex');
-                    return h(ComMain);
+    _devTools: {
+        ModulesIns:modulesIns,
+        EventEmitter: em,
+        InitTestLayout(id) {
+            let app = new Vue(
+                {
+                    el: `#${id}`,
+                    render: (h) => {
+                        // ComMain.setLayoutTpl('layout/test_flex');
+                        return h(ComMain);
+                    }
                 }
-            }
-        );
-        module.exports = {
-            inst: app,
-            em
-        };
-
-        if (window) {
-            window.clptr = module.exports;
+            );
         }
-    }
+    },
+
 };
 
 if (window) {

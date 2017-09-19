@@ -4,9 +4,4 @@
  *      core/events/emit
  **************************************************/
 
-_comm.emitter.on(
-    'core/events/emit',
-    (data) => {
-      console.log(data);
-    }
-);
+module.exports = {}

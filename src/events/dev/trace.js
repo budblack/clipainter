@@ -12,5 +12,4 @@ em.on('dev/trace', (data) => {
     }
     console.log('[开发][跟踪]', JSON.stringify(ctx));
 });
-console.log('被初始化')
 module.exports = {}
